@@ -1,15 +1,6 @@
 terraform {
   required_version = ">= 1.0.0"
 
-  backend "s3" {
-    bucket               = "koalasafe-terraform-state"
-    key                  = "terraform.tfstate"
-    region               = "ap-southeast-2"
-    dynamodb_table       = "koalasafe-terraform-locks"
-    encrypt              = true
-    workspace_key_prefix = "ingest-firehose"
-  }
-
   required_providers {
     aws = {
       source  = "hashicorp/aws"
