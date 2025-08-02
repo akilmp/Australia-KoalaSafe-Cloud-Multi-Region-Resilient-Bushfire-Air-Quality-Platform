@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = ">= 5.0"
-    }
-  }
-}
-
 provider "aws" {
   region = var.region
 }
@@ -34,9 +25,9 @@ resource "aws_iam_role" "lambda" {
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [{
-      Effect = "Allow"
+      Effect    = "Allow"
       Principal = { Service = "lambda.amazonaws.com" }
-      Action = "sts:AssumeRole"
+      Action    = "sts:AssumeRole"
     }]
   })
 }
@@ -47,18 +38,18 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
 }
 
 resource "aws_iam_role_policy" "lambda_extra" {
-  role   = aws_iam_role.lambda.id
+  role = aws_iam_role.lambda.id
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow"
-        Action = ["s3:GetObject"],
+        Effect   = "Allow"
+        Action   = ["s3:GetObject"],
         Resource = "arn:aws:s3:::${var.geojson_bucket}/${var.geojson_key}"
       },
       {
-        Effect = "Allow"
-        Action = ["dynamodb:PutItem", "dynamodb:DeleteItem"],
+        Effect   = "Allow"
+        Action   = ["dynamodb:PutItem", "dynamodb:DeleteItem"],
         Resource = "arn:aws:dynamodb:*:*:table/${var.alerts_table_name}"
       }
     ]
@@ -66,11 +57,11 @@ resource "aws_iam_role_policy" "lambda_extra" {
 }
 
 resource "aws_lambda_function" "geojson_proxy" {
-  function_name = "geojsonProxyFn"
-  handler       = "geojson_proxy.geojsonProxyFn"
-  runtime       = "python3.12"
-  role          = aws_iam_role.lambda.arn
-  filename      = data.archive_file.geojson_proxy.output_path
+  function_name    = "geojsonProxyFn"
+  handler          = "geojson_proxy.geojsonProxyFn"
+  runtime          = "python3.12"
+  role             = aws_iam_role.lambda.arn
+  filename         = data.archive_file.geojson_proxy.output_path
   source_code_hash = data.archive_file.geojson_proxy.output_base64sha256
   environment {
     variables = {
@@ -81,11 +72,11 @@ resource "aws_lambda_function" "geojson_proxy" {
 }
 
 resource "aws_lambda_function" "subscribe" {
-  function_name = "subscribeFn"
-  handler       = "subscribe.subscribeFn"
-  runtime       = "python3.12"
-  role          = aws_iam_role.lambda.arn
-  filename      = data.archive_file.subscribe.output_path
+  function_name    = "subscribeFn"
+  handler          = "subscribe.subscribeFn"
+  runtime          = "python3.12"
+  role             = aws_iam_role.lambda.arn
+  filename         = data.archive_file.subscribe.output_path
   source_code_hash = data.archive_file.subscribe.output_base64sha256
   environment {
     variables = {
@@ -95,11 +86,11 @@ resource "aws_lambda_function" "subscribe" {
 }
 
 resource "aws_lambda_function" "unsubscribe" {
-  function_name = "unsubscribeFn"
-  handler       = "unsubscribe.unsubscribeFn"
-  runtime       = "python3.12"
-  role          = aws_iam_role.lambda.arn
-  filename      = data.archive_file.unsubscribe.output_path
+  function_name    = "unsubscribeFn"
+  handler          = "unsubscribe.unsubscribeFn"
+  runtime          = "python3.12"
+  role             = aws_iam_role.lambda.arn
+  filename         = data.archive_file.unsubscribe.output_path
   source_code_hash = data.archive_file.unsubscribe.output_base64sha256
   environment {
     variables = {
@@ -144,17 +135,17 @@ resource "aws_api_gateway_resource" "alert" {
 }
 
 resource "aws_api_gateway_authorizer" "cognito" {
-  name        = "cognito-authorizer"
-  rest_api_id = aws_api_gateway_rest_api.api.id
-  type        = "COGNITO_USER_POOLS"
+  name          = "cognito-authorizer"
+  rest_api_id   = aws_api_gateway_rest_api.api.id
+  type          = "COGNITO_USER_POOLS"
   provider_arns = [var.cognito_user_pool_arn]
 }
 
 resource "aws_api_gateway_method" "get_latest" {
-  rest_api_id   = aws_api_gateway_rest_api.api.id
-  resource_id   = aws_api_gateway_resource.latest.id
-  http_method   = "GET"
-  authorization = "NONE"
+  rest_api_id      = aws_api_gateway_rest_api.api.id
+  resource_id      = aws_api_gateway_resource.latest.id
+  http_method      = "GET"
+  authorization    = "NONE"
   api_key_required = true
 }
 
