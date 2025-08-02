@@ -1,0 +1,25 @@
+{
+  "title": "Collector Overview",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "OTel Collector CPU",
+      "targets": [
+        {
+          "expr": "process_cpu_seconds_total"
+        }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Lambda Invocations",
+      "datasource": "CloudWatch",
+      "targets": [
+        {
+          "metricName": "Invocations",
+          "namespace": "AWS/Lambda"
+        }
+      ]
+    }
+  ]
+}

@@ -137,7 +137,9 @@ koalasafe-cloud/
 │   └── geojson_processor/         # Dockerised Fargate app
 ├── frontend/                      # Vite + React + Mapbox
 ├── scripts/
-│   └── failure_sim.sh             # Game‑day automation
+│   ├── failure_sim.sh             # Game-day automation
+│   ├── ecs_chaos_automation.yaml  # SSM document to stop random ECS task
+│   └── schedule_chaos.sh          # Publish and schedule automation
 ├── .github/workflows/             # GHA pipelines
 ├── docs/
 │   ├── architecture.drawio
@@ -298,12 +300,12 @@ Grafana dashboards JSON exported to `docs/grafana/*.json`.
 ## Disaster Recovery & Game‑Day Scenarios
 
 * **Fail‑over Mechanism**: Route 53 weighted records 80 % → Sydney, 20 % → Melbourne; health check on `/health` ALB path.
-* **Game‑day Script** (`scripts/failure_sim.sh`):
+* **Game-day Script** (`scripts/failure_sim.sh`):
 
-  1. Terminates primary ALB.
-  2. Monitors Route 53 `HealthCheckPercentage` until fail‑over occurs (< 60 s).
-  3. Restores ALB; flips traffic back.
-* **Chaos Plan**: Use SSM Automation to randomly stop ECS tasks during business hours once/week.
+    1. Disables deletion protection and deletes the primary ALB.
+    2. Polls Route 53 health check until fail-over occurs.
+    3. Recreates the ALB from a CloudFormation template and waits for it to become healthy.
+* **Chaos Plan**: `scripts/schedule_chaos.sh` publishes an SSM Automation document (`scripts/ecs_chaos_automation.yaml`) that randomly stops an ECS task and schedules it to run weekly.
 
 ---
 
