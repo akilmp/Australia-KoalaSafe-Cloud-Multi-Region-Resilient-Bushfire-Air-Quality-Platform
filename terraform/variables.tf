@@ -72,4 +72,5 @@ variable "geojson_bucket" {
 variable "cognito_user_pool_arn" {
   type        = string
   description = "ARN of Cognito User Pool"
+
 }

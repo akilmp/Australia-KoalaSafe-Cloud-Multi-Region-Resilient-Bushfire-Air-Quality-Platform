@@ -43,10 +43,11 @@ module "ingest_firehose" {
 module "compute_fargate" {
   source = "./compute-fargate"
 
-  name               = var.name
-  region             = var.region
-  subnet_ids         = module.core_network.private_subnet_ids
-  security_group_ids = [module.core_network.security_group_id]
+  name                = var.name
+  region              = var.region
+  subnet_ids          = module.core_network.private_subnet_ids
+  security_group_ids  = [module.core_network.security_group_id]
+  prometheus_endpoint = var.prometheus_endpoint
 }
 
 module "api_gateway" {
