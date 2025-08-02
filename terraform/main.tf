@@ -37,7 +37,7 @@ module "ingest_firehose" {
   region              = var.region
   lambda_s3_bucket    = var.lambda_s3_bucket
   lambda_s3_key       = var.lambda_s3_key
-  delivery_bucket_arn = var.delivery_bucket_arn
+  delivery_bucket_arn = module.data_storage.bucket_arn
 }
 
 module "compute_fargate" {
@@ -46,7 +46,7 @@ module "compute_fargate" {
   name               = var.name
   region             = var.region
   subnet_ids         = module.core_network.private_subnet_ids
-  security_group_ids = var.security_group_ids
+  security_group_ids = [module.core_network.security_group_id]
 }
 
 module "edge_frontend" {
