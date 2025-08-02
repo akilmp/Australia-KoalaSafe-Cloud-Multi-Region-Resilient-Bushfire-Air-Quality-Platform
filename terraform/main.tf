@@ -53,6 +53,7 @@ module "compute_fargate" {
   firehose_bucket         = module.data_storage.bucket_name
   output_bucket           = module.data_storage.bucket_name
   mapbox_token_secret_arn = aws_secretsmanager_secret.mapbox_token.arn
+
 }
 module "edge_frontend" {
   source = "./edge-frontend"

@@ -7,6 +7,17 @@ provider "aws" {
   region = var.secondary_region
 }
 
+resource "aws_kms_key" "data" {
+  description             = "KMS key for primary data bucket"
+  deletion_window_in_days = 10
+}
+
+resource "aws_kms_key" "data_replica" {
+  provider                = aws.secondary
+  description             = "KMS key for replica data bucket"
+  deletion_window_in_days = 10
+}
+
 resource "aws_s3_bucket" "data" {
   bucket        = "${var.name}-data-${terraform.workspace}"
   force_destroy = true
@@ -18,7 +29,8 @@ resource "aws_s3_bucket" "data" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
+        kms_master_key_id = aws_kms_key.data.arn
+        sse_algorithm     = "aws:kms"
       }
     }
   }
@@ -46,7 +58,8 @@ resource "aws_s3_bucket" "data_replica" {
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {
-        sse_algorithm = "AES256"
+        kms_master_key_id = aws_kms_key.data_replica.arn
+        sse_algorithm     = "aws:kms"
       }
     }
   }
@@ -93,6 +106,21 @@ data "aws_iam_policy_document" "replication" {
       "${aws_s3_bucket.data_replica.arn}/*"
     ]
   }
+
+  statement {
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:CreateGrant"
+    ]
+    resources = [
+      aws_kms_key.data.arn,
+      aws_kms_key.data_replica.arn
+    ]
+  }
 }
 
 resource "aws_iam_role_policy" "replication" {
@@ -111,6 +139,16 @@ resource "aws_s3_bucket_replication_configuration" "data" {
     destination {
       bucket        = aws_s3_bucket.data_replica.arn
       storage_class = "STANDARD"
+
+      encryption_configuration {
+        replica_kms_key_id = aws_kms_key.data_replica.arn
+      }
+    }
+
+    source_selection_criteria {
+      sse_kms_encrypted_objects {
+        status = "Enabled"
+      }
     }
   }
 }

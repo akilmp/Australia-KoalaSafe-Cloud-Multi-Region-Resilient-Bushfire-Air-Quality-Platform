@@ -37,4 +37,5 @@ variable "output_bucket" {
 variable "mapbox_token_secret_arn" {
   type        = string
   description = "ARN of the Mapbox token secret"
+
 }
