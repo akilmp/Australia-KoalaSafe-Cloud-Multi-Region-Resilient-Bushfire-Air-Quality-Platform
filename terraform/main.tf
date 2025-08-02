@@ -28,6 +28,7 @@ module "data_storage" {
   name             = var.name
   region           = var.region
   secondary_region = var.secondary_region
+  expo_token       = var.expo_token
 }
 
 module "ingest_firehose" {
@@ -67,4 +68,13 @@ module "edge_frontend" {
   domain_name        = var.domain_name
   origin_domain_name = var.origin_domain_name
   hosted_zone_id     = var.hosted_zone_id
+}
+
+module "api_gateway" {
+  source = "./api_gateway"
+
+  region                = var.region
+  cognito_user_pool_arn = var.cognito_user_pool_arn
+  geo_fences_table_name = module.data_storage.geo_fences_table_name
+  geojson_bucket        = module.data_storage.bucket_name
 }

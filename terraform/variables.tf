@@ -59,18 +59,14 @@ variable "hosted_zone_id" {
   description = "Route53 hosted zone ID"
 }
 
-variable "alerts_table_name" {
-  type        = string
-  description = "DynamoDB table for alert subscriptions"
-}
-
-variable "geojson_bucket" {
-  type        = string
-  description = "S3 bucket containing latest GeoJSON"
-}
-
 variable "cognito_user_pool_arn" {
   type        = string
   description = "ARN of Cognito User Pool"
+}
+
+variable "expo_token" {
+  type        = string
+  description = "Expo push token for push bridge Lambda"
+  default     = ""
 
 }

@@ -12,3 +12,9 @@ variable "secondary_region" {
   type        = string
   description = "Secondary AWS region for replication"
 }
+
+variable "expo_token" {
+  type        = string
+  description = "Expo push token for push bridge Lambda"
+  default     = ""
+}
