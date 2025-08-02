@@ -14,13 +14,41 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
+resource "aws_iam_policy" "lambda_firehose_access" {
+  name = "${var.name}-lambda-firehose-access"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = "firehose:PutRecordBatch"
+      Resource = aws_kinesis_firehose_delivery_stream.stream.arn
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_firehose_access" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = aws_iam_policy.lambda_firehose_access.arn
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
 resource "aws_lambda_function" "processor" {
   function_name = "${var.name}-processor"
   s3_bucket     = var.lambda_s3_bucket
   s3_key        = var.lambda_s3_key
   role          = aws_iam_role.lambda_exec.arn
-  handler       = "index.handler"
+  handler       = "handlers.handler"
   runtime       = "python3.11"
+
+  environment {
+    variables = {
+      FIREHOSE_STREAM_NAME = aws_kinesis_firehose_delivery_stream.stream.name
+    }
+  }
 }
 
 # Schedule to run every 30 seconds
@@ -53,6 +81,33 @@ resource "aws_iam_role" "firehose" {
       Principal = { Service = "firehose.amazonaws.com" }
     }]
   })
+}
+
+resource "aws_iam_policy" "firehose_s3_access" {
+  name = "${var.name}-firehose-s3-access"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "s3:AbortMultipartUpload",
+        "s3:GetBucketLocation",
+        "s3:GetObject",
+        "s3:ListBucket",
+        "s3:ListBucketMultipartUploads",
+        "s3:PutObject"
+      ],
+      Resource = [
+        var.delivery_bucket_arn,
+        "${var.delivery_bucket_arn}/*"
+      ]
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "firehose_s3_access" {
+  role       = aws_iam_role.firehose.name
+  policy_arn = aws_iam_policy.firehose_s3_access.arn
 }
 
 resource "aws_kinesis_firehose_delivery_stream" "stream" {
