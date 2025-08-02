@@ -33,6 +33,11 @@ jobs:
         run: terraform -chdir=terraform workspace select $TF_WORKSPACE || terraform -chdir=terraform workspace new $TF_WORKSPACE
       - name: Terraform Plan
         run: terraform -chdir=terraform plan -out=tfplan
+      - name: tfsec
+        uses: aquasecurity/tfsec-action@v1
+        with:
+          working_directory: terraform
+          additional_args: --minimum-severity HIGH
       - name: Show Plan JSON
         run: terraform -chdir=terraform show -json tfplan > tfplan.json
       - name: Conftest
