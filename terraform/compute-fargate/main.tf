@@ -69,7 +69,7 @@ resource "aws_ecs_task_definition" "geojson" {
   container_definitions = jsonencode([
     {
       name      = "processor"
-      image     = "123456789012.dkr.ecr.${var.region}.amazonaws.com/geojson-processor:latest"
+      image     = var.container_image
       essential = true
       portMappings = [
         {
