@@ -23,6 +23,26 @@ resource "aws_lambda_function" "processor" {
   runtime       = "python3.11"
 }
 
+# Schedule to run every 30 seconds
+resource "aws_cloudwatch_event_rule" "ingest_schedule" {
+  name                = "${var.name}-ingest-schedule"
+  schedule_expression = "rate(30 seconds)"
+}
+
+resource "aws_cloudwatch_event_target" "ingest_target" {
+  rule      = aws_cloudwatch_event_rule.ingest_schedule.name
+  target_id = "lambda"
+  arn       = aws_lambda_function.processor.arn
+}
+
+resource "aws_lambda_permission" "allow_events" {
+  statement_id  = "AllowExecutionFromEventBridge"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.processor.function_name
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.ingest_schedule.arn
+}
+
 resource "aws_iam_role" "firehose" {
   name = "${var.name}-firehose-role"
   assume_role_policy = jsonencode({
