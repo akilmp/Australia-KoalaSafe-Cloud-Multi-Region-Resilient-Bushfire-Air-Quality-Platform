@@ -31,7 +31,7 @@
 
 ## Project Overview
 
-**KoalaSafe Cloud** is a multi‑region, serverless‑first AWS platform that ingests real‑time NSW bush‑fire incidents, NASA satellite hotspots, and NSW air‑quality sensor data. It processes, unifies, and geo‑indexes these feeds, serves a Mapbox‑based web dashboard, and sends user‑configured SMS / push alerts when an active fire perimeter intersects custom geo‑fences. The stack demonstrates every core competency expected of a 2025 Cloud Engineer:
+**KoalaSafe Cloud** is a multi‑region, serverless‑first AWS platform that ingests real‑time NSW bush‑fire incidents, NASA satellite hotspots, and NSW air‑quality sensor data. It processes, unifies, and geo‑indexes these feeds, serves a Mapbox‑based web dashboard, and sends user‑configured SMS / push alerts when an active fire perimeter intersects custom geo‑fences. The stack demonstrates every core competency expected:
 
 | Competency                  | Demonstrated By                                                                                                     |
 | --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
