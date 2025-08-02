@@ -1,5 +1,7 @@
 .terraform/
-*.zip
-__pycache__/
-*.pyc
-
+terraform/tfplan
+terraform/tfplan.json
+terraform/tfplan.*
+*.tfstate
+*.tfstate.backup
+*.terraform.tfstate*
