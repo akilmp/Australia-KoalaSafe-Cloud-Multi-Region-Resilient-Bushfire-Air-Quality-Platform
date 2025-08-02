@@ -51,6 +51,7 @@ module "compute_fargate" {
   prometheus_endpoint = var.prometheus_endpoint
   firehose_bucket     = module.data_storage.bucket_name
   output_bucket       = module.data_storage.bucket_name
+  container_image     = var.container_image
 }
 module "edge_frontend" {
   source = "./edge-frontend"
