@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Bushfire ingestion lambda with scheduled trigger
+
+Resources:
+  IngestLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/AWSLambdaVPCAccessExecutionRole
+      Policies:
+        - PolicyName: FirehosePutPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - firehose:PutRecordBatch
+                Resource: arn:aws:firehose:*:*:deliverystream/bushfire_raw
+
+  IngestLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Runtime: python3.11
+      Handler: ingest_lambda.handlers.handler
+      Role: !GetAtt IngestLambdaRole.Arn
+      Code:
+        S3Bucket: PLACEHOLDER_BUCKET
+        S3Key: PLACEHOLDER_KEY
+      Timeout: 60
+      MemorySize: 256
+      Environment:
+        Variables:
+          FIREHOSE_STREAM_NAME: bushfire_raw
+
+  IngestEventRule:
+    Type: AWS::Events::Rule
+    Properties:
+      ScheduleExpression: rate(30 seconds)
+      Targets:
+        - Arn: !GetAtt IngestLambda.Arn
+          Id: IngestLambdaTarget
+
+  PermissionForEventsToInvokeLambda:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref IngestLambda
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt IngestEventRule.Arn

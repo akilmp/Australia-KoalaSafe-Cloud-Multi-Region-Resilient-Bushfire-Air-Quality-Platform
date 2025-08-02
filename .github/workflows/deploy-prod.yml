@@ -1,0 +1,77 @@
+---
+name: Deploy to Production
+
+'on':
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Run tests and build frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install backend dependencies
+        run: |
+          pip install -r backend/requirements.txt
+      - name: Run unit tests
+        run: |
+          pytest
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: Install frontend dependencies
+        run: |
+          npm ci --prefix frontend
+      - name: Build frontend
+        env:
+          MAPBOX_TOKEN: ${{ secrets.MAPBOX_TOKEN }}
+        run: |
+          npm run build --prefix frontend
+
+  terraform:
+    name: Terraform deploy
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+      - name: Terraform Init
+        run: terraform -chdir=terraform init
+      - name: Terraform Plan
+        run: terraform -chdir=terraform plan
+      - name: Terraform Apply
+        run: terraform -chdir=terraform apply -auto-approve
+
+  deploy:
+    name: Deploy ECS task
+    runs-on: ubuntu-latest
+    needs: terraform
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ecs/task-def.json
+          service: my-service
+          cluster: my-cluster
+          wait-for-service-stability: true
