@@ -7,3 +7,8 @@ variable "region" {
   type        = string
   description = "AWS region"
 }
+
+variable "secondary_region" {
+  type        = string
+  description = "Secondary AWS region for replication"
+}
