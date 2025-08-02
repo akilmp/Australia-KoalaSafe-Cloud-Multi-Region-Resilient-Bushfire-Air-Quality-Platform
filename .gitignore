@@ -1,1 +1,5 @@
+.terraform/
+*.zip
 __pycache__/
+*.pyc
+
