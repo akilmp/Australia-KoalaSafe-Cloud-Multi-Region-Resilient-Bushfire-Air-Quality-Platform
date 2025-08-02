@@ -1,0 +1,48 @@
+{
+  "family": "geojson-processor",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "taskRoleArn": "arn:aws:iam::123456789012:role/geojson-task-role",
+  "executionRoleArn": "arn:aws:iam::123456789012:role/geojson-task-role",
+  "containerDefinitions": [
+    {
+      "name": "processor",
+      "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/geojson-processor:latest",
+      "essential": true,
+      "environment": [
+        {"name": "FIREHOSE_BUCKET", "value": "firehose-bucket"},
+        {"name": "OUTPUT_BUCKET", "value": "output-bucket"}
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/geojson-processor",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    },
+    {
+      "name": "adot-collector",
+      "image": "public.ecr.aws/aws-observability/aws-otel-collector:latest",
+      "essential": false,
+      "command": ["--config=/etc/ecs/ecs-default-config.yaml"],
+      "environment": [
+        {
+          "name": "AOT_CONFIG_CONTENT",
+          "value": "receivers:\n  awsecscontainermetrics:\n  otlp:\n    protocols:\n      grpc:\n      http:\nexporters:\n  awsprometheusremotewrite:\n    endpoint: \"https://aps-workspaces.us-east-1.amazonaws.com/workspaces/WORKSPACE_ID/api/v1/remote_write\"\nservice:\n  pipelines:\n    metrics:\n      receivers: [awsecscontainermetrics]\n      exporters: [awsprometheusremotewrite]\n    traces:\n      receivers: [otlp]\n      exporters: [awsprometheusremotewrite]"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/geojson-processor",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "adot"
+        }
+      }
+    }
+  ]
+}
