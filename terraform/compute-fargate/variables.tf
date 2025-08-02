@@ -17,3 +17,8 @@ variable "security_group_ids" {
   type        = list(string)
   description = "Security groups for the load balancer"
 }
+
+variable "prometheus_endpoint" {
+  type        = string
+  description = "Remote write endpoint for Prometheus metrics"
+}
