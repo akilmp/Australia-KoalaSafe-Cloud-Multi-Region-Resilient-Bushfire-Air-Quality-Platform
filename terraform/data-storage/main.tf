@@ -249,9 +249,26 @@ resource "aws_lambda_function" "push_bridge" {
   role             = aws_iam_role.push_bridge.arn
   environment {
     variables = {
-      EXPO_TOKEN = var.expo_token
+      EXPO_TOKEN_SECRET_ARN = var.expo_token_secret_arn
     }
   }
+}
+
+resource "aws_iam_policy" "push_bridge_secret" {
+  name = "${var.name}-push-bridge-secret-${terraform.workspace}"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action   = ["secretsmanager:GetSecretValue"],
+      Effect   = "Allow",
+      Resource = var.expo_token_secret_arn
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "push_bridge_secret_attach" {
+  role       = aws_iam_role.push_bridge.name
+  policy_arn = aws_iam_policy.push_bridge_secret.arn
 }
 
 resource "aws_sns_topic_subscription" "push_bridge" {

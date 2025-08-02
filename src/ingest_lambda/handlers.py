@@ -10,6 +10,12 @@ FIREHOSE_STREAM_NAME = os.environ.get("FIREHOSE_STREAM_NAME", "bushfire_raw")
 firehose = boto3.client("firehose", region_name=os.environ.get("AWS_REGION", "us-east-1"))
 
 NSW_RFS_URL = "https://www.rfs.nsw.gov.au/feeds/majorIncidents.json"
+NASA_API_KEY = os.environ.get("NASA_API_KEY")
+NASA_API_KEY_SECRET_ARN = os.environ.get("NASA_API_KEY_SECRET_ARN")
+if NASA_API_KEY_SECRET_ARN and not NASA_API_KEY:
+    sm = boto3.client("secretsmanager", region_name=os.environ.get("AWS_REGION", "us-east-1"))
+    resp = sm.get_secret_value(SecretId=NASA_API_KEY_SECRET_ARN)
+    NASA_API_KEY = resp.get("SecretString")
 NASA_FIRMS_URL = (
     "https://firms.modaps.eosdis.nasa.gov/active_fire/c6/geojson/MODIS_C6_Australia_NewZealand_24h.geojson"
 )

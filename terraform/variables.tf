@@ -43,6 +43,11 @@ variable "lambda_s3_key" {
   description = "S3 key for Lambda code"
 }
 
+variable "secret_rotation_lambda_arn" {
+  type        = string
+  description = "ARN of the Lambda function that rotates secrets"
+}
+
 
 variable "domain_name" {
   type        = string
@@ -64,12 +69,6 @@ variable "cognito_user_pool_arn" {
   description = "ARN of Cognito User Pool"
 }
 
-variable "expo_token" {
-  type        = string
-  description = "Expo push token for push bridge Lambda"
-  default     = ""
-
-}
 
 variable "prometheus_endpoint" {
   type        = string

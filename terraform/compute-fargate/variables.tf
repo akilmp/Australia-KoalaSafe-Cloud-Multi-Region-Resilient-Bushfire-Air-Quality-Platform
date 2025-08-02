@@ -33,3 +33,8 @@ variable "output_bucket" {
   description = "S3 bucket for processed output"
 
 }
+
+variable "mapbox_token_secret_arn" {
+  type        = string
+  description = "ARN of the Mapbox token secret"
+}

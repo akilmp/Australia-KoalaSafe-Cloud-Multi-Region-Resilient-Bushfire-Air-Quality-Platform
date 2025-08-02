@@ -2,8 +2,22 @@ import json
 import os
 import urllib.request
 
+import boto3
+
 EXPO_URL = "https://exp.host/--/api/v2/push/send"
-EXPO_TOKEN = os.environ.get("EXPO_TOKEN")
+
+
+def _get_token() -> str | None:
+    token = os.environ.get("EXPO_TOKEN")
+    if token:
+        return token
+    secret_arn = os.environ.get("EXPO_TOKEN_SECRET_ARN")
+    if secret_arn:
+        sm = boto3.client("secretsmanager")
+        resp = sm.get_secret_value(SecretId=secret_arn)
+        return resp.get("SecretString")
+    return None
+
 
 def lambda_handler(event, context):
     detail = event.get('detail', {})
@@ -15,8 +29,9 @@ def lambda_handler(event, context):
     }
     data = json.dumps(message).encode('utf-8')
     headers = {'Content-Type': 'application/json'}
-    if EXPO_TOKEN:
-        headers['Authorization'] = f'Bearer {EXPO_TOKEN}'
+    token = _get_token()
+    if token:
+        headers['Authorization'] = f'Bearer {token}'
     request = urllib.request.Request(EXPO_URL, data=data, headers=headers)
     with urllib.request.urlopen(request) as resp:
         resp.read()
