@@ -49,6 +49,8 @@ module "compute_fargate" {
   subnet_ids          = module.core_network.private_subnet_ids
   security_group_ids  = [module.core_network.security_group_id]
   prometheus_endpoint = var.prometheus_endpoint
+  firehose_bucket     = module.data_storage.bucket_name
+  output_bucket       = module.data_storage.bucket_name
 }
 
 module "api_gateway" {
