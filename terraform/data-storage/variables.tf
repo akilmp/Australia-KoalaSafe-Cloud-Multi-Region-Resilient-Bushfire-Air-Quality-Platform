@@ -13,8 +13,7 @@ variable "secondary_region" {
   description = "Secondary AWS region for replication"
 }
 
-variable "expo_token" {
+variable "expo_token_secret_arn" {
   type        = string
-  description = "Expo push token for push bridge Lambda"
-  default     = ""
+  description = "ARN of the Expo push token secret"
 }

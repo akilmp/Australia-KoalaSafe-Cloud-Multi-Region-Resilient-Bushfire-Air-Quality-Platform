@@ -22,3 +22,8 @@ variable "delivery_bucket_arn" {
   type        = string
   description = "Destination S3 bucket ARN for Firehose"
 }
+
+variable "nasa_api_key_secret_arn" {
+  type        = string
+  description = "ARN of the NASA API key secret"
+}

@@ -46,9 +46,27 @@ resource "aws_lambda_function" "processor" {
 
   environment {
     variables = {
-      FIREHOSE_STREAM_NAME = aws_kinesis_firehose_delivery_stream.stream.name
+      FIREHOSE_STREAM_NAME    = aws_kinesis_firehose_delivery_stream.stream.name,
+      NASA_API_KEY_SECRET_ARN = var.nasa_api_key_secret_arn
     }
   }
+}
+
+resource "aws_iam_policy" "lambda_secret" {
+  name = "${var.name}-lambda-secret"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action   = ["secretsmanager:GetSecretValue"],
+      Effect   = "Allow",
+      Resource = var.nasa_api_key_secret_arn
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_secret_attach" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = aws_iam_policy.lambda_secret.arn
 }
 
 # Schedule to run every 30 seconds

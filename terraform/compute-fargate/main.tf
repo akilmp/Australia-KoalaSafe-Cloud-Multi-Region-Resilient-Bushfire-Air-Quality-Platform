@@ -79,6 +79,23 @@ resource "aws_iam_role_policy_attachment" "geojson_s3_attach" {
   policy_arn = aws_iam_policy.geojson_s3.arn
 }
 
+resource "aws_iam_policy" "mapbox_secret" {
+  name = "${var.name}-mapbox-secret"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [{
+      Action   = ["secretsmanager:GetSecretValue"],
+      Effect   = "Allow",
+      Resource = var.mapbox_token_secret_arn
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "mapbox_secret_attach" {
+  role       = aws_iam_role.geojson_task.name
+  policy_arn = aws_iam_policy.mapbox_secret.arn
+}
+
 resource "aws_ecs_task_definition" "geojson" {
   family                   = "${var.name}-geojson"
   network_mode             = "awsvpc"
@@ -96,6 +113,9 @@ resource "aws_ecs_task_definition" "geojson" {
       environment = [
         { name = "FIREHOSE_BUCKET", value = var.firehose_bucket },
         { name = "OUTPUT_BUCKET", value = var.output_bucket }
+      ]
+      secrets = [
+        { name = "MAPBOX_TOKEN", valueFrom = var.mapbox_token_secret_arn }
       ]
       portMappings = [
         {

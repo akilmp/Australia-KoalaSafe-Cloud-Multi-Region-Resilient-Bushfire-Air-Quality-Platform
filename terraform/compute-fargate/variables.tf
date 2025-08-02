@@ -34,7 +34,8 @@ variable "output_bucket" {
 
 }
 
-variable "container_image" {
+variable "mapbox_token_secret_arn" {
   type        = string
-  description = "Container image for Fargate task"
+  description = "ARN of the Mapbox token secret"
+
 }

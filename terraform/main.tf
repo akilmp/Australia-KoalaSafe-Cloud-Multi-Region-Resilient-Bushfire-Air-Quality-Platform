@@ -25,33 +25,35 @@ module "core_network" {
 module "data_storage" {
   source = "./data-storage"
 
-  name             = var.name
-  region           = var.region
-  secondary_region = var.secondary_region
-  expo_token       = var.expo_token
+  name                  = var.name
+  region                = var.region
+  secondary_region      = var.secondary_region
+  expo_token_secret_arn = aws_secretsmanager_secret.expo_token.arn
 }
 
 module "ingest_firehose" {
   source = "./ingest-firehose"
 
-  name                = var.name
-  region              = var.region
-  lambda_s3_bucket    = var.lambda_s3_bucket
-  lambda_s3_key       = var.lambda_s3_key
-  delivery_bucket_arn = module.data_storage.bucket_arn
+  name                    = var.name
+  region                  = var.region
+  lambda_s3_bucket        = var.lambda_s3_bucket
+  lambda_s3_key           = var.lambda_s3_key
+  delivery_bucket_arn     = module.data_storage.bucket_arn
+  nasa_api_key_secret_arn = aws_secretsmanager_secret.nasa_api_key.arn
 }
 
 module "compute_fargate" {
   source = "./compute-fargate"
 
-  name                = var.name
-  region              = var.region
-  subnet_ids          = module.core_network.private_subnet_ids
-  security_group_ids  = [module.core_network.security_group_id]
-  prometheus_endpoint = var.prometheus_endpoint
-  firehose_bucket     = module.data_storage.bucket_name
-  output_bucket       = module.data_storage.bucket_name
-  container_image     = var.container_image
+  name                    = var.name
+  region                  = var.region
+  subnet_ids              = module.core_network.private_subnet_ids
+  security_group_ids      = [module.core_network.security_group_id]
+  prometheus_endpoint     = var.prometheus_endpoint
+  firehose_bucket         = module.data_storage.bucket_name
+  output_bucket           = module.data_storage.bucket_name
+  mapbox_token_secret_arn = aws_secretsmanager_secret.mapbox_token.arn
+
 }
 module "edge_frontend" {
   source = "./edge-frontend"
