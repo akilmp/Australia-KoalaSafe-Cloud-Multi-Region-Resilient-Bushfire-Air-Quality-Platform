@@ -9,7 +9,7 @@ variable "cognito_user_pool_arn" {
   type        = string
 }
 
-variable "alerts_table_name" {
+variable "geo_fences_table_name" {
   description = "DynamoDB table for alert subscriptions"
   type        = string
 }

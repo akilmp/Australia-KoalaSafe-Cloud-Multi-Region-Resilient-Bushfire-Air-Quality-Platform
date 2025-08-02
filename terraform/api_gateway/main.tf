@@ -50,7 +50,7 @@ resource "aws_iam_role_policy" "lambda_extra" {
       {
         Effect   = "Allow"
         Action   = ["dynamodb:PutItem", "dynamodb:DeleteItem"],
-        Resource = "arn:aws:dynamodb:*:*:table/${var.alerts_table_name}"
+        Resource = "arn:aws:dynamodb:*:*:table/${var.geo_fences_table_name}"
       }
     ]
   })
@@ -80,7 +80,7 @@ resource "aws_lambda_function" "subscribe" {
   source_code_hash = data.archive_file.subscribe.output_base64sha256
   environment {
     variables = {
-      ALERTS_TABLE = var.alerts_table_name
+      ALERTS_TABLE = var.geo_fences_table_name
     }
   }
 }
@@ -94,7 +94,7 @@ resource "aws_lambda_function" "unsubscribe" {
   source_code_hash = data.archive_file.unsubscribe.output_base64sha256
   environment {
     variables = {
-      ALERTS_TABLE = var.alerts_table_name
+      ALERTS_TABLE = var.geo_fences_table_name
     }
   }
 }

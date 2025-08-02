@@ -58,3 +58,14 @@ variable "hosted_zone_id" {
   type        = string
   description = "Route53 hosted zone ID"
 }
+
+variable "cognito_user_pool_arn" {
+  type        = string
+  description = "ARN of Cognito User Pool"
+}
+
+variable "expo_token" {
+  type        = string
+  description = "Expo push token for push bridge Lambda"
+  default     = ""
+}
