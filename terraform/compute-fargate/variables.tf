@@ -31,4 +31,5 @@ variable "firehose_bucket" {
 variable "output_bucket" {
   type        = string
   description = "S3 bucket for processed output"
+
 }
