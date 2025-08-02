@@ -55,6 +55,11 @@ jobs:
         run: terraform -chdir=terraform workspace select prod || terraform -chdir=terraform workspace new prod
       - name: Terraform Plan
         run: terraform -chdir=terraform plan
+      - name: tfsec
+        uses: aquasecurity/tfsec-action@v1
+        with:
+          working_directory: terraform
+          additional_args: --minimum-severity HIGH
       - name: Terraform Apply
         run: terraform -chdir=terraform apply -auto-approve
 
