@@ -8,7 +8,8 @@ resource "aws_acm_certificate" "cert" {
 }
 
 resource "aws_cloudfront_distribution" "cdn" {
-  enabled = true
+  enabled    = true
+  web_acl_id = aws_wafv2_web_acl.waf.arn
 
   origin {
     domain_name = var.origin_domain_name
