@@ -70,3 +70,18 @@ variable "expo_token" {
   default     = ""
 
 }
+
+variable "prometheus_endpoint" {
+  type        = string
+  description = "Prometheus remote write endpoint"
+}
+
+variable "geo_fences_table_name" {
+  type        = string
+  description = "DynamoDB table name for geo fences"
+}
+
+variable "geojson_bucket" {
+  type        = string
+  description = "S3 bucket for GeoJSON data"
+}

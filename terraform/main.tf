@@ -50,16 +50,6 @@ module "compute_fargate" {
   security_group_ids  = [module.core_network.security_group_id]
   prometheus_endpoint = var.prometheus_endpoint
 }
-
-module "api_gateway" {
-  source = "./api_gateway"
-
-  region                = var.region
-  alerts_table_name     = var.alerts_table_name
-  geojson_bucket        = var.geojson_bucket
-  cognito_user_pool_arn = var.cognito_user_pool_arn
-}
-
 module "edge_frontend" {
   source = "./edge-frontend"
 
