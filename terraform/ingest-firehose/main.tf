@@ -42,7 +42,7 @@ resource "aws_lambda_function" "processor" {
   s3_key        = var.lambda_s3_key
   role          = aws_iam_role.lambda_exec.arn
   handler       = "handlers.handler"
-  runtime       = "python3.11"
+  runtime       = "python3.12"
 
   environment {
     variables = {
