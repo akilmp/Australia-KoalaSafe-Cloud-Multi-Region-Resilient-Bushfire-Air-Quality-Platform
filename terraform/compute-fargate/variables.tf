@@ -22,3 +22,8 @@ variable "prometheus_endpoint" {
   type        = string
   description = "Remote write endpoint for Prometheus metrics"
 }
+
+variable "container_image" {
+  type        = string
+  description = "Container image for the geojson processor"
+}
