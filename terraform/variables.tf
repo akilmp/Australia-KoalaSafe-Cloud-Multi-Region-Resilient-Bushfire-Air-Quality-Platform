@@ -43,15 +43,6 @@ variable "lambda_s3_key" {
   description = "S3 key for Lambda code"
 }
 
-variable "delivery_bucket_arn" {
-  type        = string
-  description = "Destination S3 bucket ARN for Firehose"
-}
-
-variable "security_group_ids" {
-  type        = list(string)
-  description = "Security groups for compute resources"
-}
 
 variable "domain_name" {
   type        = string
