@@ -37,7 +37,7 @@ resource "aws_route53_record" "sydney" {
   health_check_id = aws_route53_health_check.sydney.id
 
   weighted_routing_policy {
-    weight = 100
+    weight = 80
   }
 
   alias {
@@ -55,7 +55,7 @@ resource "aws_route53_record" "melbourne" {
   health_check_id = aws_route53_health_check.melbourne.id
 
   weighted_routing_policy {
-    weight = 0
+    weight = 20
   }
 
   alias {
