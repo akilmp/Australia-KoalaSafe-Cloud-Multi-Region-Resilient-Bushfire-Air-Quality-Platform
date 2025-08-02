@@ -58,3 +58,8 @@ variable "hosted_zone_id" {
   type        = string
   description = "Route53 hosted zone ID"
 }
+
+variable "prometheus_endpoint" {
+  type        = string
+  description = "Remote write endpoint for Prometheus metrics"
+}
