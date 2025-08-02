@@ -1,0 +1,32 @@
+---
+description: "Randomly stop an ECS task to simulate failure"
+schemaVersion: '0.3'
+parameters:
+  ClusterName:
+    type: String
+    description: ECS cluster name
+  ServiceName:
+    type: String
+    description: ECS service to target
+  AutomationAssumeRole:
+    type: String
+    description: IAM role that allows Systems Manager Automation to run this document
+    default: ""
+mainSteps:
+  - name: ChooseAndStopTask
+    action: 'aws:executeScript'
+    inputs:
+      Runtime: python3.8
+      Handler: run
+      Script: |
+        import boto3, random
+        ecs = boto3.client('ecs')
+        cluster = params['ClusterName']
+        service = params['ServiceName']
+        tasks = ecs.list_tasks(cluster=cluster, serviceName=service)['taskArns']
+        if not tasks:
+          raise Exception('No running tasks found')
+        task = random.choice(tasks)
+        ecs.stop_task(cluster=cluster, task=task, reason='Chaos experiment')
+        return {'stoppedTask': task}
+    onFailure: Abort
