@@ -57,6 +57,28 @@ resource "aws_iam_role_policy_attachment" "task_exec" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+resource "aws_iam_policy" "geojson_s3" {
+  name = "${var.name}-s3-access"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action = ["s3:GetObject", "s3:PutObject", "s3:ListBucket"]
+      Effect = "Allow"
+      Resource = [
+        "arn:aws:s3:::${var.firehose_bucket}",
+        "arn:aws:s3:::${var.firehose_bucket}/*",
+        "arn:aws:s3:::${var.output_bucket}",
+        "arn:aws:s3:::${var.output_bucket}/*",
+      ]
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "geojson_s3_attach" {
+  role       = aws_iam_role.geojson_task.name
+  policy_arn = aws_iam_policy.geojson_s3.arn
+}
+
 resource "aws_ecs_task_definition" "geojson" {
   family                   = "${var.name}-geojson"
   network_mode             = "awsvpc"
@@ -71,6 +93,10 @@ resource "aws_ecs_task_definition" "geojson" {
       name      = "processor"
       image     = var.container_image
       essential = true
+      environment = [
+        { name = "FIREHOSE_BUCKET", value = var.firehose_bucket },
+        { name = "OUTPUT_BUCKET", value = var.output_bucket }
+      ]
       portMappings = [
         {
           containerPort = 80

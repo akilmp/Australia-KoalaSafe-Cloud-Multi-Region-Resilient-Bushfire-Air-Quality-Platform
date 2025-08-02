@@ -23,7 +23,13 @@ variable "prometheus_endpoint" {
   description = "Remote write endpoint for Prometheus metrics"
 }
 
-variable "container_image" {
+variable "firehose_bucket" {
   type        = string
-  description = "Container image for the geojson processor"
+  description = "S3 bucket used by Firehose"
+}
+
+variable "output_bucket" {
+  type        = string
+  description = "S3 bucket for processed output"
+
 }
