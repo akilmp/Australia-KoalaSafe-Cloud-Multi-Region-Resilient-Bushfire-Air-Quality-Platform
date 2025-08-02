@@ -7,13 +7,24 @@ on:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        workspace: [dev, prod]
+    env:
+      TF_WORKSPACE: ${{ matrix.workspace }}
     steps:
       - uses: actions/checkout@v3
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: 1.5.0
       - uses: instrumenta/setup-conftest@v1
-      - run: terraform init
-      - run: terraform plan -out=tfplan
-      - run: terraform show -json tfplan > tfplan.json
-      - run: conftest test tfplan.json
+      - name: Terraform Init
+        run: terraform -chdir=terraform init
+      - name: Select Workspace
+        run: terraform -chdir=terraform workspace select $TF_WORKSPACE || terraform -chdir=terraform workspace new $TF_WORKSPACE
+      - name: Terraform Plan
+        run: terraform -chdir=terraform plan -out=tfplan
+      - name: Show Plan JSON
+        run: terraform -chdir=terraform show -json tfplan > tfplan.json
+      - name: Conftest
+        run: conftest test tfplan.json
