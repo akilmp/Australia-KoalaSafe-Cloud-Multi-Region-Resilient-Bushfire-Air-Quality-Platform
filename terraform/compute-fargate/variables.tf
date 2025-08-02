@@ -33,3 +33,8 @@ variable "output_bucket" {
   description = "S3 bucket for processed output"
 
 }
+
+variable "container_image" {
+  type        = string
+  description = "Container image for Fargate task"
+}

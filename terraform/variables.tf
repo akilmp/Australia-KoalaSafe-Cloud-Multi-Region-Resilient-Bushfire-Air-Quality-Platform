@@ -85,3 +85,8 @@ variable "geojson_bucket" {
   type        = string
   description = "S3 bucket for GeoJSON data"
 }
+
+variable "container_image" {
+  type        = string
+  description = "Container image for Fargate task"
+}
