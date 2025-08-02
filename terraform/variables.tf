@@ -68,4 +68,5 @@ variable "expo_token" {
   type        = string
   description = "Expo push token for push bridge Lambda"
   default     = ""
+
 }

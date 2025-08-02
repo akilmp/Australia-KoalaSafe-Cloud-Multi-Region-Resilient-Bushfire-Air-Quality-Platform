@@ -44,10 +44,20 @@ module "ingest_firehose" {
 module "compute_fargate" {
   source = "./compute-fargate"
 
-  name               = var.name
-  region             = var.region
-  subnet_ids         = module.core_network.private_subnet_ids
-  security_group_ids = [module.core_network.security_group_id]
+  name                = var.name
+  region              = var.region
+  subnet_ids          = module.core_network.private_subnet_ids
+  security_group_ids  = [module.core_network.security_group_id]
+  prometheus_endpoint = var.prometheus_endpoint
+}
+
+module "api_gateway" {
+  source = "./api_gateway"
+
+  region                = var.region
+  alerts_table_name     = var.alerts_table_name
+  geojson_bucket        = var.geojson_bucket
+  cognito_user_pool_arn = var.cognito_user_pool_arn
 }
 
 module "edge_frontend" {
