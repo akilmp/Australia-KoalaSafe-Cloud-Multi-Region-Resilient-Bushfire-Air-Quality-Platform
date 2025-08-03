@@ -18,6 +18,11 @@ variable "security_group_ids" {
   description = "Security groups for the load balancer"
 }
 
+variable "container_image" {
+  type        = string
+  description = "Container image for Fargate task"
+}
+
 variable "prometheus_endpoint" {
   type        = string
   description = "Remote write endpoint for Prometheus metrics"
