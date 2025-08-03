@@ -29,3 +29,11 @@ output "private_route_table_id" {
 output "security_group_id" {
   value = aws_security_group.default.id
 }
+
+output "s3_vpc_endpoint_id" {
+  value = aws_vpc_endpoint.s3.id
+}
+
+output "dynamodb_vpc_endpoint_id" {
+  value = aws_vpc_endpoint.dynamodb.id
+}
