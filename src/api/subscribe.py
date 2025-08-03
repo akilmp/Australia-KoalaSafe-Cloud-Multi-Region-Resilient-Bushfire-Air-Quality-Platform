@@ -1,6 +1,5 @@
 import json
 import os
-import uuid
 import boto3
 
 dynamodb = boto3.resource('dynamodb')
@@ -11,14 +10,14 @@ def subscribeFn(event, context):
     table = dynamodb.Table(os.environ['ALERTS_TABLE'])
     user_id = event['requestContext']['authorizer']['claims']['sub']
     body = json.loads(event.get('body') or '{}')
-    alert_id = str(uuid.uuid4())
+    fence_id = body['fence_id']
     item = {
-        'id': alert_id,
         'user_id': user_id,
+        'fence_id': fence_id,
         'params': body
     }
     table.put_item(Item=item)
     return {
         'statusCode': 201,
-        'body': json.dumps({'id': alert_id})
+        'body': json.dumps({'fence_id': fence_id})
     }

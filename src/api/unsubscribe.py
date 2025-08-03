@@ -11,12 +11,11 @@ def unsubscribeFn(event, context):
     """Remove alert subscription belonging to the authenticated user."""
     table = dynamodb.Table(os.environ['ALERTS_TABLE'])
     user_id = event['requestContext']['authorizer']['claims']['sub']
-    alert_id = event['pathParameters']['id']
+    fence_id = event['pathParameters']['fence_id']
     try:
         table.delete_item(
-            Key={'id': alert_id},
-            ConditionExpression='user_id = :u',
-            ExpressionAttributeValues={':u': user_id}
+            Key={'user_id': user_id, 'fence_id': fence_id},
+            ConditionExpression='attribute_exists(fence_id)'
         )
     except ClientError as exc:
         if exc.response['Error']['Code'] == 'ConditionalCheckFailedException':
