@@ -3,6 +3,9 @@ import os
 import urllib.request
 
 import boto3
+from opentelemetry.instrumentation.aws_lambda import AwsLambdaInstrumentor
+
+AwsLambdaInstrumentor().instrument()
 
 EXPO_URL = "https://exp.host/--/api/v2/push/send"
 

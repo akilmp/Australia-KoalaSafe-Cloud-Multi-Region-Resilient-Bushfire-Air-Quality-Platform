@@ -4,6 +4,9 @@ from typing import List, Dict, Any
 
 import requests
 import boto3
+from opentelemetry.instrumentation.aws_lambda import AwsLambdaInstrumentor
+
+AwsLambdaInstrumentor().instrument()
 
 FIREHOSE_STREAM_NAME = os.environ.get("FIREHOSE_STREAM_NAME", "bushfire_raw")
 

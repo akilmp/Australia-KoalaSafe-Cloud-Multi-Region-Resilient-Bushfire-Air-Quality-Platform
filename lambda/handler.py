@@ -1,5 +1,5 @@
 from opentelemetry import trace
-from opentelemetry.instrumentation.awslambda import AwsLambdaInstrumentor
+from opentelemetry.instrumentation.aws_lambda import AwsLambdaInstrumentor
 
 # Instrument the Lambda handler
 AwsLambdaInstrumentor().instrument()
