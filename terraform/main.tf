@@ -49,6 +49,7 @@ module "compute_fargate" {
   region                  = var.region
   subnet_ids              = module.core_network.private_subnet_ids
   security_group_ids      = [module.core_network.security_group_id]
+  container_image         = var.container_image
   prometheus_endpoint     = var.prometheus_endpoint
   firehose_bucket         = module.data_storage.bucket_name
   output_bucket           = module.data_storage.bucket_name
