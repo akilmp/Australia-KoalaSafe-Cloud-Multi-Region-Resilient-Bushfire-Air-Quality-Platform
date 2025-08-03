@@ -1,5 +1,8 @@
 import json
 import boto3
+from opentelemetry.instrumentation.aws_lambda import AwsLambdaInstrumentor
+
+AwsLambdaInstrumentor().instrument()
 
 eventbridge = boto3.client('events')
 
